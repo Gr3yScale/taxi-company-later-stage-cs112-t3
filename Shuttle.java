@@ -1,15 +1,14 @@
-import java.util.List;
 import java.util.LinkedList;
-    
+import java.util.List;
+
 /**
  * A shuttle is able to carry multiple passengers.
  * This implementation is non-functional.
- * 
+ *
  * @author David J. Barnes and Michael Kölling
  * @version 2016.02.29
  */
-public class Shuttle extends Vehicle
-{
+public class Shuttle extends Vehicle {
     // The list of destinations for the shuttle.
     private List<Location> destinations;
     // The list of passengers on the shuttle.
@@ -17,12 +16,12 @@ public class Shuttle extends Vehicle
 
     /**
      * Constructor for objects of class Shuttle
-     * @param company The taxi company. Must not be null.
+     *
+     * @param company  The taxi company. Must not be null.
      * @param location The vehicle's starting point. Must not be null.
      * @throws NullPointerException If company or location is null.
      */
-    public Shuttle(TaxiCompany company, Location location)
-    {
+    public Shuttle(TaxiCompany company, Location location) {
         super(company, location);
         destinations = new LinkedList<>();
         passengers = new LinkedList<>();
@@ -31,36 +30,35 @@ public class Shuttle extends Vehicle
     /**
      * Carry out a shuttle's actions.
      */
-    public void act()
-    {
+    public void act() {
     }
 
     /**
      * Is the shuttle free?
+     *
      * @return Whether or not this vehicle is free.
      */
-    public boolean isFree()
-    {
+    public boolean isFree() {
         return true;
     }
-    
+
     /**
      * Receive a pickup location.
+     *
      * @param location The pickup location.
      */
-    public void setPickupLocation(Location location)
-    {
+    public void setPickupLocation(Location location) {
         destinations.add(location);
         chooseTargetLocation();
     }
-    
+
     /**
      * Receive a passenger.
      * Add their destination to the list.
+     *
      * @param passenger The passenger.
      */
-    public void pickup(Passenger passenger)
-    {
+    public void pickup(Passenger passenger) {
         passengers.add(passenger);
         destinations.add(passenger.getDestination());
         chooseTargetLocation();
@@ -70,15 +68,13 @@ public class Shuttle extends Vehicle
      * Decide where to go next, based on the list of
      * possible destinations.
      */
-    private void chooseTargetLocation()
-    {
+    private void chooseTargetLocation() {
     }
 
     /**
      * Offload a passenger whose destination is the
      * current location.
      */
-    public void offloadPassenger()
-    {
+    public void offloadPassenger() {
     }
 }
