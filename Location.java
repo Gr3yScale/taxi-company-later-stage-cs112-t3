@@ -37,6 +37,8 @@ public class Location {
      * destination.
      */
     public Location nextLocation(Location destination) {
+        if (destination == null)
+            throw new IllegalArgumentException("Destination is null");
         int destX = destination.getX();
         int destY = destination.getY();
         int offsetX = x < destX ? 1 : x > destX ? -1 : 0;
@@ -56,6 +58,8 @@ public class Location {
      * @return The number of movement steps.
      */
     public int distance(Location destination) {
+        if (destination == null)
+            throw new IllegalArgumentException("Destination is null");
         int xDist = Math.abs(destination.getX() - x);
         int yDist = Math.abs(destination.getY() - y);
         return Math.max(xDist, yDist);

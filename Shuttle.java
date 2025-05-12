@@ -48,6 +48,8 @@ public class Shuttle extends Vehicle {
      * @param location The pickup location.
      */
     public void setPickupLocation(Location location) {
+        if (location == null)
+            throw new IllegalArgumentException("Location is null");
         destinations.add(location);
         chooseTargetLocation();
     }
@@ -59,6 +61,8 @@ public class Shuttle extends Vehicle {
      * @param passenger The passenger.
      */
     public void pickup(Passenger passenger) {
+        if (passenger == null)
+            throw new IllegalArgumentException("Passenger is null");
         passengers.add(passenger);
         destinations.add(passenger.getDestination());
         chooseTargetLocation();

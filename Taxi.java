@@ -69,6 +69,11 @@ public class Taxi extends Vehicle implements DrawableItem {
      * @param location The pickup location.
      */
     public void setPickupLocation(Location location) {
+        if (!isFree())
+            throw new IllegalArgumentException("Cannot set pickup location when taxi is not free");
+        if (location == null) {
+            throw new IllegalArgumentException("Cannot set pickup location when taxi is null");
+        }
         setTargetLocation(location);
     }
 
@@ -79,6 +84,8 @@ public class Taxi extends Vehicle implements DrawableItem {
      * @param passenger The passenger.
      */
     public void pickup(Passenger passenger) {
+        if (passenger == null)
+            throw new IllegalArgumentException("Cannot pickup passenger when one is already present");
         this.passenger = passenger;
         setTargetLocation(passenger.getDestination());
     }

@@ -21,6 +21,9 @@ public class TaxiCompany {
      * @param city The city.
      */
     public TaxiCompany(City city) {
+        if (city == null) {
+            throw new IllegalArgumentException("City cannot be null");
+        }
         this.city = city;
         vehicles = new LinkedList<>();
         assignments = new HashMap<>();
@@ -34,6 +37,9 @@ public class TaxiCompany {
      * @return Whether a free vehicle is available.
      */
     public boolean requestPickup(Passenger passenger) {
+        if (passenger == null) {
+            throw new IllegalArgumentException("Passenger cannot be null");
+        }
         Vehicle vehicle = scheduleVehicle();
         if (vehicle != null) {
             assignments.put(vehicle, passenger);
@@ -51,6 +57,9 @@ public class TaxiCompany {
      * @throws MissingPassengerException If there is no passenger waiting.
      */
     public void arrivedAtPickup(Vehicle vehicle) {
+        if (vehicle == null) {
+            throw new IllegalArgumentException("Vehicle cannot be null");
+        }
         Passenger passenger = assignments.remove(vehicle);
         if (passenger == null) {
             throw new MissingPassengerException(vehicle);
@@ -67,6 +76,12 @@ public class TaxiCompany {
      */
     public void arrivedAtDestination(Vehicle vehicle,
                                      Passenger passenger) {
+        if (vehicle == null) {
+            throw new IllegalArgumentException("Vehicle cannot be null");
+        }
+        if (passenger == null) {
+            throw new IllegalArgumentException("Passenger cannot be null");
+        }
     }
 
     /**

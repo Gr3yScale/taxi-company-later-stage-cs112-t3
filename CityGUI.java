@@ -21,6 +21,8 @@ public class CityGUI extends JFrame implements Actor {
      * @param city The city whose state is to be displayed.
      */
     public CityGUI(City city) {
+        if (city == null)
+            throw new NullPointerException("City cannot be null");
         this.city = city;
         cityView = new CityView(city.getWidth(), city.getHeight());
         getContentPane().add(cityView);

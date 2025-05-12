@@ -31,7 +31,7 @@ public class Simulation {
      * Pause after each step to allow the GUI to keep up.
      */
     public void run() {
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < 5000; i++) {
             step++;
             step();
             wait(100);

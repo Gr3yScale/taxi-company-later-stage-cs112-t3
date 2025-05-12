@@ -45,7 +45,10 @@ public abstract class Vehicle implements Actor {
      * passenger's destination.
      */
     public void notifyPassengerArrival(Passenger passenger) {
-        company.arrivedAtDestination(this, passenger);
+        if (passenger == null) {
+            throw new NullPointerException("passenger");
+        } else
+            company.arrivedAtDestination(this, passenger);
     }
 
     /**
