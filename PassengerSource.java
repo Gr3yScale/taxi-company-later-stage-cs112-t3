@@ -9,11 +9,12 @@ import java.util.Random;
  * @version 2016.02.29
  */
 public class PassengerSource implements Actor {
-    private City city;
-    private TaxiCompany company;
+    private final City city;
+    private final TaxiCompany company;
     private Random rand;
     private static final double CREATION_PROBABILITY = 0.06;
     private int missedPickups;
+    private int totalPassengersCreated;
 
     /**
      * Constructor for objects of class PassengerSource.
@@ -32,9 +33,9 @@ public class PassengerSource implements Actor {
         this.city = city;
         this.company = company;
         // Use a fixed random seed for repeatable effects.
-        // Change this to produce more random effects.
         rand = new Random(12345);
         missedPickups = 0;
+        totalPassengersCreated = 0;
     }
 
     /**
@@ -44,6 +45,7 @@ public class PassengerSource implements Actor {
     public void act() {
         if (rand.nextDouble() <= CREATION_PROBABILITY) {
             Passenger passenger = createPassenger();
+            totalPassengersCreated++;
             if (company.requestPickup(passenger)) {
                 city.addItem(passenger);
             } else {
@@ -60,6 +62,12 @@ public class PassengerSource implements Actor {
         return missedPickups;
     }
 
+    /**
+     * @return The total number of passengers created.
+     */
+    public int getTotalPassengersCreated() {
+        return totalPassengersCreated;
+    }
     /**
      * Create a new passenger with distinct pickup and
      * destination locations.

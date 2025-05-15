@@ -9,11 +9,13 @@ import java.util.*;
  */
 public class TaxiCompany {
     // The vehicles operated by the company.
-    private List<Vehicle> vehicles;
-    private City city;
-    // The associations between vehicles and the passengers
-    // they are to pick up.
-    private Map<Vehicle, Passenger> assignments;
+    private final List<Vehicle> vehicles;
+    private final City city;
+    // Track pickups and dropoffs.
+    private int totalPickups;
+    private int totalDropoffs;
+    // Associations between vehicles and the passengers they are to pick up.
+    private final Map<Vehicle, Passenger> assignments;
 
     private static final int NUMBER_OF_TAXIS = 3;
 
@@ -28,6 +30,35 @@ public class TaxiCompany {
         vehicles = new LinkedList<>();
         assignments = new HashMap<>();
         setupVehicles();
+    }
+
+    public void incrementPickups() {
+        totalPickups++;
+    }
+
+    public void incrementDropoffs() {
+        totalDropoffs++;
+    }
+
+    public int getTotalPickups() {
+        return totalPickups;
+    }
+
+    public int getTotalDropoffs() {
+        return totalDropoffs;
+    }
+
+    /**
+     * Return the number of taxis that currently have passengers.
+     */
+    public int getActiveTaxiCount() {
+        int count = 0;
+        for (Vehicle v : vehicles) {
+            if (!v.isFree()) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**
@@ -50,6 +81,15 @@ public class TaxiCompany {
         }
     }
 
+    public int getTotalIdleSteps() {
+        int total = 0;
+        for (Vehicle v : vehicles) {
+            if (v instanceof Taxi) {
+                total += ((Taxi) v).getIdleSteps();
+            }
+        }
+        return total;
+    }
     /**
      * A vehicle has arrived at a pickup point.
      *
@@ -66,6 +106,7 @@ public class TaxiCompany {
         }
         city.removeItem(passenger);
         vehicle.pickup(passenger);
+        incrementPickups(); // Count pickup
     }
 
     /**
@@ -74,14 +115,14 @@ public class TaxiCompany {
      * @param vehicle   The vehicle at the destination.
      * @param passenger The passenger being dropped off.
      */
-    public void arrivedAtDestination(Vehicle vehicle,
-                                     Passenger passenger) {
+    public void arrivedAtDestination(Vehicle vehicle, Passenger passenger) {
         if (vehicle == null) {
             throw new IllegalArgumentException("Vehicle cannot be null");
         }
         if (passenger == null) {
             throw new IllegalArgumentException("Passenger cannot be null");
         }
+        incrementDropoffs(); // Count dropoff
     }
 
     /**
@@ -97,9 +138,7 @@ public class TaxiCompany {
      * @return A free vehicle, or null if there is none.
      */
     private Vehicle scheduleVehicle() {
-        Iterator<Vehicle> it = vehicles.iterator();
-        while (it.hasNext()) {
-            Vehicle vehicle = it.next();
+        for (Vehicle vehicle : vehicles) {
             if (vehicle.isFree()) {
                 return vehicle;
             }
@@ -108,25 +147,16 @@ public class TaxiCompany {
     }
 
     /**
-     * Set up this company's vehicles. The optimum number of
-     * vehicles should be determined by analysis of the
-     * data gathered from the simulation.
-     * <p>
+     * Set up this company's vehicles.
      * Vehicles start at random locations.
      */
     private void setupVehicles() {
         int cityWidth = city.getWidth();
         int cityHeight = city.getHeight();
-        // Used a fixed random seed for predictable behavior.
-        // Use different seeds for less predictable behavior.
         Random rand = new Random(12345);
 
-        // Create the taxis.
         for (int i = 0; i < NUMBER_OF_TAXIS; i++) {
-            Taxi taxi =
-                    new Taxi(this,
-                            new Location(rand.nextInt(cityWidth),
-                                    rand.nextInt(cityHeight)));
+            Taxi taxi = new Taxi(this, new Location(rand.nextInt(cityWidth), rand.nextInt(cityHeight)));
             vehicles.add(taxi);
             city.addItem(taxi);
         }

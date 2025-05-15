@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * A taxi is able to carry a single passenger.
@@ -11,7 +12,8 @@ public class Taxi extends Vehicle implements DrawableItem {
     private Passenger passenger;
     // Maintain separate images for when the taxi is empty
     // and full.
-    private Image emptyImage, passengerImage;
+    private final Image emptyImage, passengerImage;
+    private int idleSteps;
 
     /**
      * Constructor for objects of class Taxi
@@ -23,11 +25,11 @@ public class Taxi extends Vehicle implements DrawableItem {
     public Taxi(TaxiCompany company, Location location) {
         super(company, location);
         // Load the two images.
-        emptyImage = new ImageIcon(getClass().getResource(
-                "images/taxi.jpg")).getImage();
+        emptyImage = new ImageIcon(Objects.requireNonNull(getClass().getResource(
+                "images/taxi.jpg"))).getImage();
 
-        passengerImage = new ImageIcon(getClass().getResource(
-                "images/taxi+person.jpg")).getImage();
+        passengerImage = new ImageIcon(Objects.requireNonNull(getClass().getResource(
+                "images/taxi+person.jpg"))).getImage();
     }
 
     /**
@@ -36,6 +38,9 @@ public class Taxi extends Vehicle implements DrawableItem {
      */
     public void act() {
         Location target = getTargetLocation();
+        if(isFree()) {
+            idleSteps++;
+        }
         if (target != null) {
             // Find where to move to next.
             Location next = getLocation().nextLocation(target);
@@ -110,6 +115,9 @@ public class Taxi extends Vehicle implements DrawableItem {
         }
     }
 
+    public int getIdleSteps() {
+        return idleSteps;
+    }
     /**
      * Return details of the taxi, such as where it is.
      *

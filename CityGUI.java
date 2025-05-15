@@ -12,25 +12,42 @@ public class CityGUI extends JFrame implements Actor {
     // The dimensions of the GUI.
     public static final int CITY_VIEW_WIDTH = 600;
     public static final int CITY_VIEW_HEIGHT = 600;
-    private City city;
-    private CityView cityView;
+    private final City city;
+    private final TaxiCompany company;
+    private final CityView cityView;
+
+    // Task 16.27
+    private final JLabel statsLabel;
+    private final PassengerSource passengerSource;
+
 
     /**
      * Constructor for objects of class CityGUI
      *
-     * @param city The city whose state is to be displayed.
+     * @param city    The city whose state is to be displayed.
+     * @param company The taxi company that manages taxis and passengers.
      */
-    public CityGUI(City city) {
+    public CityGUI(City city, TaxiCompany company, PassengerSource passengerSource) {
         if (city == null)
             throw new NullPointerException("City cannot be null");
+        if (company == null)
+            throw new NullPointerException("Company cannot be null");
+        if (passengerSource == null)
+            throw new NullPointerException("PassengerSource cannot be null");
+
         this.city = city;
+        this.company = company;
+        this.passengerSource = passengerSource;
+
         cityView = new CityView(city.getWidth(), city.getHeight());
         getContentPane().add(cityView);
         setTitle("Taxiville");
+        setResizable(false);
         setSize(CITY_VIEW_WIDTH, CITY_VIEW_HEIGHT);
         setVisible(true);
-        cityView.preparePaint();
-        cityView.repaint();
+        statsLabel = new JLabel("Pickups: 0  |  Dropoffs: 0");
+        statsLabel.setFont(new Font("Monospaced", Font.BOLD, 7));
+        getContentPane().add(statsLabel, BorderLayout.SOUTH);
     }
 
     /**
@@ -41,22 +58,26 @@ public class CityGUI extends JFrame implements Actor {
         Iterator<Item> items = city.getItems();
         while (items.hasNext()) {
             Item item = items.next();
-            if (item instanceof DrawableItem) {
-                DrawableItem drawable = (DrawableItem) item;
+            if (item instanceof DrawableItem drawable) {
                 Location location = item.getLocation();
                 cityView.drawImage(location.getX(), location.getY(), drawable.getImage());
             }
         }
-        cityView.repaint();
-    }
+        // Update stats label
+        int pickups = company.getTotalPickups();
+        int dropoffs = company.getTotalDropoffs();
+        int missed = passengerSource.getMissedPickups();
+        int created = passengerSource.getTotalPassengersCreated();
+        long activeTaxis = company.getVehicles().stream().filter(v -> !v.isFree()).count();
 
+        statsLabel.setText(String.format("Passengers Collected: %d  |  Passengers Dropped Off: %d  |  Passengers Missed: %d  |  Jobs Created: %d  |  Active Taxis: %d",
+                pickups, dropoffs, missed, created, activeTaxis));
+    }
     /**
      * Provide a graphical view of a rectangular city. This is
      * a nested class (a class defined inside a class) which
      * defines a custom component for the user interface. This
      * component displays the city.
-     * This is rather advanced GUI stuff - you can ignore this
-     * for your project if you like.
      */
     private class CityView extends JPanel {
         private final int VIEW_SCALING_FACTOR = 6;

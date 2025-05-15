@@ -8,7 +8,7 @@ import java.util.List;
  * @version 2016.02.29
  */
 public class Simulation {
-    private List<Actor> actors;
+    private final List<Actor> actors;
     private int step;
 
     /**
@@ -21,9 +21,10 @@ public class Simulation {
         TaxiCompany company = new TaxiCompany(city);
         PassengerSource source = new PassengerSource(city, company);
 
+        // Adding all vehicles, source, and GUI to the actors list
         actors.addAll(company.getVehicles());
         actors.add(source);
-        actors.add(new CityGUI(city));
+        actors.add(new CityGUI(city, company, source)); // Pass PassengerSource here
     }
 
     /**
