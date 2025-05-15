@@ -4,9 +4,11 @@
 
 ### Group Members and Division of Work
 
-| **Name**          | **Work Contribution** |
-|--------------------|------------------------|
-| Isaac Oxenham     | 16.26                 |
-| Cameron Clancy    |                        |
-| Stuart Barr       |                        |
-| Russel Wright     |                        |
+| **Name**       | **Work Contribution** |
+|----------------|-----------------------|
+| Isaac Oxenham  | 16.26                 |
+| Cameron Clancy |                       |
+| Stuart Barr    |                       |
+| Russel Wright  |                       |
+
+![img.png](tasks.png)
