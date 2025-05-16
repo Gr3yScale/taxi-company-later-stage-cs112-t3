@@ -1,48 +1,43 @@
-/**
- * Model a location in a city.
- *
- * @author David J. Barnes and Michael Kölling
- * @version 2016.02.29
- */
 public class Location {
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
 
     /**
-     * Model a location in the city.
+     * Construct a location with specific coordinates.
      *
-     * @param x The x coordinate. Must be positive.
-     * @param y The y coordinate. Must be positive.
-     * @throws IllegalArgumentException If a coordinate is negative.
+     * @param x The x-coordinate (must be non-negative).
+     * @param y The y-coordinate (must be non-negative).
+     * @throws IllegalArgumentException If either coordinate is negative.
      */
     public Location(int x, int y) {
         if (x < 0) {
-            throw new IllegalArgumentException(
-                    "Negative x-coordinate: " + x);
+            throw new IllegalArgumentException("Negative x-coordinate: " + x);
         }
         if (y < 0) {
-            throw new IllegalArgumentException(
-                    "Negative y-coordinate: " + y);
+            throw new IllegalArgumentException("Negative y-coordinate: " + y);
         }
         this.x = x;
         this.y = y;
     }
 
     /**
-     * Generate the next location to visit in order to
-     * reach the destination.
+     * Calculate the next location in a direct line towards a destination.
+     * Movement is limited to one step in either direction.
      *
-     * @param destination Where we want to get to.
-     * @return A location in a direct line from this to
-     * destination.
+     * @param destination The target location (must not be null).
+     * @return A new location one step closer to the destination.
      */
     public Location nextLocation(Location destination) {
-        if (destination == null)
+        if (destination == null) {
             throw new IllegalArgumentException("Destination is null");
+        }
+
         int destX = destination.getX();
         int destY = destination.getY();
-        int offsetX = x < destX ? 1 : x > destX ? -1 : 0;
-        int offsetY = y < destY ? 1 : y > destY ? -1 : 0;
+
+        int offsetX = Integer.compare(destX, x); // 1, 0, or -1
+        int offsetY = Integer.compare(destY, y); // 1, 0, or -1
+
         if (offsetX != 0 || offsetY != 0) {
             return new Location(x + offsetX, y + offsetY);
         } else {
@@ -51,63 +46,64 @@ public class Location {
     }
 
     /**
-     * Determine the number of movements required to get
-     * from here to the destination.
+     * Calculate the number of steps required to move from this location
+     * to the destination. Diagonal movement is allowed.
      *
-     * @param destination The required destination.
-     * @return The number of movement steps.
+     * @param destination The target location (must not be null).
+     * @return The number of steps needed to reach the destination.
      */
     public int distance(Location destination) {
-        if (destination == null)
+        if (destination == null) {
             throw new IllegalArgumentException("Destination is null");
+        }
+
         int xDist = Math.abs(destination.getX() - x);
         int yDist = Math.abs(destination.getY() - y);
         return Math.max(xDist, yDist);
     }
 
     /**
-     * Implement content equality for locations.
+     * Compare this location to another object for equality.
      *
-     * @return true if this location matches the other,
-     * false otherwise.
+     * @param other The object to compare against.
+     * @return true if the object is a Location with the same coordinates.
      */
+    @Override
     public boolean equals(Object other) {
         if (other instanceof Location) {
             Location otherLocation = (Location) other;
-            return x == otherLocation.getX() &&
-                    y == otherLocation.getY();
-        } else {
-            return false;
+            return x == otherLocation.getX() && y == otherLocation.getY();
         }
+        return false;
     }
 
     /**
-     * @return A representation of the location.
+     * @return A string representation of the location in the format "location x,y".
      */
+    @Override
     public String toString() {
         return "location " + x + "," + y;
     }
 
     /**
-     * Use the top 16 bits for the y value and the bottom for the x.
-     * Except for very big grids, this should give a unique hash code
-     * for each (x, y) pair.
+     * Generate a unique hash code based on the (x, y) coordinates.
      *
-     * @return A hashcode for the location.
+     * @return A hash code for the location.
      */
+    @Override
     public int hashCode() {
         return (y << 16) + x;
     }
 
     /**
-     * @return The x coordinate.
+     * @return The x-coordinate of the location.
      */
     public int getX() {
         return x;
     }
 
     /**
-     * @return The y coordinate.
+     * @return The y-coordinate of the location.
      */
     public int getY() {
         return y;

@@ -2,29 +2,22 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
 
-/**
- * A taxi is able to carry a single passenger.
- *
- * @author David J. Barnes and Michael Kölling
- * @version 2016.02.29
- */
 public class Taxi extends Vehicle implements DrawableItem {
     private Passenger passenger;
-    // Maintain separate images for when the taxi is empty
-    // and full.
-    private final Image emptyImage, passengerImage;
+    private final Image emptyImage;
+    private final Image passengerImage;
     private int idleSteps;
 
     /**
-     * Constructor for objects of class Taxi
+     * Create a new Taxi.
      *
-     * @param company  The taxi company. Must not be null.
-     * @param location The vehicle's starting point. Must not be null.
-     * @throws NullPointerException If company or location is null.
+     * @param company  The taxi company managing this taxi. Must not be null.
+     * @param location The starting location of the taxi. Must not be null.
+     * @throws NullPointerException if company or location is null.
      */
     public Taxi(TaxiCompany company, Location location) {
         super(company, location);
-        // Load the two images.
+
         emptyImage = new ImageIcon(Objects.requireNonNull(getClass().getResource(
                 "images/taxi.jpg"))).getImage();
 
@@ -33,23 +26,30 @@ public class Taxi extends Vehicle implements DrawableItem {
     }
 
     /**
-     * Move towards the target location if we have one.
-     * Otherwise record that we are idle.
+     * Perform the taxi's action:
+     * - Move toward a target location, if any.
+     * - If free and idle, increment idle steps.
+     * - Handle arrival logic for pickup or drop-off.
      */
     public void act() {
         Location target = getTargetLocation();
-        if(isFree()) {
+
+        if (isFree()) {
             idleSteps++;
         }
+
         if (target != null) {
-            // Find where to move to next.
             Location next = getLocation().nextLocation(target);
+            System.out.println("Taxi moving from " + getLocation() + " to " + next);
             setLocation(next);
+
             if (next.equals(target)) {
                 if (passenger != null) {
+                    System.out.println("Arrived at passenger destination: " + target);
                     notifyPassengerArrival(passenger);
                     offloadPassenger();
                 } else {
+                    System.out.println("Arrived at pickup location: " + target);
                     notifyPickupArrival();
                 }
             }
@@ -59,44 +59,46 @@ public class Taxi extends Vehicle implements DrawableItem {
     }
 
     /**
-     * Is the taxi free?
+     * Check if the taxi is free (no target and no passenger).
      *
-     * @return Whether or not this taxi is free.
+     * @return true if taxi is available, false otherwise.
      */
     public boolean isFree() {
         return getTargetLocation() == null && passenger == null;
     }
 
     /**
-     * Receive a pickup location. This becomes the
-     * target location.
+     * Assign a pickup location.
      *
-     * @param location The pickup location.
+     * @param location The pickup location (not null).
+     * @throws IllegalArgumentException if taxi is not free or location is null.
      */
     public void setPickupLocation(Location location) {
-        if (!isFree())
+        if (!isFree()) {
             throw new IllegalArgumentException("Cannot set pickup location when taxi is not free");
+        }
         if (location == null) {
-            throw new IllegalArgumentException("Cannot set pickup location when taxi is null");
+            throw new IllegalArgumentException("Pickup location cannot be null");
         }
         setTargetLocation(location);
     }
 
     /**
-     * Receive a passenger.
-     * Set their destination as the target location.
+     * Load a passenger into the taxi and set their destination as the new target.
      *
-     * @param passenger The passenger.
+     * @param passenger The passenger to pick up (not null).
+     * @throws IllegalArgumentException if passenger is null.
      */
     public void pickup(Passenger passenger) {
-        if (passenger == null)
-            throw new IllegalArgumentException("Cannot pickup passenger when one is already present");
+        if (passenger == null) {
+            throw new IllegalArgumentException("Passenger cannot be null");
+        }
         this.passenger = passenger;
         setTargetLocation(passenger.getDestination());
     }
 
     /**
-     * Offload the passenger.
+     * Drop off the current passenger and clear the target.
      */
     public void offloadPassenger() {
         passenger = null;
@@ -104,22 +106,25 @@ public class Taxi extends Vehicle implements DrawableItem {
     }
 
     /**
-     * Return an image that describes our state:
-     * either empty or carrying a passenger.
+     * Return the appropriate image depending on taxi's state.
+     *
+     * @return Image of empty or occupied taxi.
      */
     public Image getImage() {
-        if (passenger != null) {
-            return passengerImage;
-        } else {
-            return emptyImage;
-        }
+        return (passenger != null) ? passengerImage : emptyImage;
     }
 
+    /**
+     * Get the number of steps the taxi has been idle.
+     *
+     * @return Idle step count.
+     */
     public int getIdleSteps() {
         return idleSteps;
     }
+
     /**
-     * Return details of the taxi, such as where it is.
+     * Return a string describing the taxi's location.
      *
      * @return A string representation of the taxi.
      */
