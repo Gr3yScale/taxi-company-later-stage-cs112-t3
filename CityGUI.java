@@ -72,6 +72,7 @@ public class CityGUI extends JFrame implements Actor {
 
         statsLabel.setText(String.format("Passengers Collected: %d  |  Passengers Dropped Off: %d  |  Passengers Missed: %d  |  Jobs Created: %d  |  Active Taxis: %d",
                 pickups, dropoffs, missed, created, activeTaxis));
+        cityView.repaint();
     }
     /**
      * Provide a graphical view of a rectangular city. This is

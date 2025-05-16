@@ -12,6 +12,9 @@ public abstract class Vehicle implements Actor {
     private Location targetLocation;
     // Record how often the vehicle has nothing to do.
     private int idleCount;
+    private int pickupTravelTime;
+    private int destinationTravelTime;
+    private boolean headingForPickup;
 
     /**
      * Constructor of class Vehicle

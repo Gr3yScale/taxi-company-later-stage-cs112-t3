@@ -44,12 +44,22 @@ public class Taxi extends Vehicle implements DrawableItem {
         if (target != null) {
             // Find where to move to next.
             Location next = getLocation().nextLocation(target);
+
+            // Add debugging to print movement
+            System.out.println("Taxi moving from " + getLocation() + " to " + next);
+
             setLocation(next);
             if (next.equals(target)) {
                 if (passenger != null) {
+                    // Add debugging
+                    System.out.println("Arrived at passenger destination: " + target);
+
                     notifyPassengerArrival(passenger);
                     offloadPassenger();
                 } else {
+                    // Add debugging
+                    System.out.println("Arrived at pickup location: " + target);
+
                     notifyPickupArrival();
                 }
             }
