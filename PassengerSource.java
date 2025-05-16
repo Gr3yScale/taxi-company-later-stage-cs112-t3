@@ -1,46 +1,40 @@
 import java.util.Random;
 
-/**
- * Periodically generate passengers.
- * Keep track of the number of passengers for whom
- * a vehicle cannot be found.
- *
- * @author David J. Barnes and Michael Kölling
- * @version 2016.02.29
- */
 public class PassengerSource implements Actor {
     private final City city;
     private final TaxiCompany company;
-    private Random rand;
+    private final Random rand;
     private static final double CREATION_PROBABILITY = 0.06;
     private int missedPickups;
     private int totalPassengersCreated;
 
     /**
-     * Constructor for objects of class PassengerSource.
+     * Construct a PassengerSource that will create passengers in a given city
+     * and request pickups from a specified taxi company.
      *
-     * @param city    The city. Must not be null.
-     * @param company The company to be used. Must not be null.
-     * @throws NullPointerException if city or company is null.
+     * @param city    The city in which passengers will be created (must not be null).
+     * @param company The taxi company used for handling pickups (must not be null).
+     * @throws NullPointerException if either city or company is null.
      */
     public PassengerSource(City city, TaxiCompany company) {
         if (city == null) {
-            throw new NullPointerException("city");
+            throw new NullPointerException("City must not be null.");
         }
         if (company == null) {
-            throw new NullPointerException("company");
+            throw new NullPointerException("Company must not be null.");
         }
+
         this.city = city;
         this.company = company;
-        // Use a fixed random seed for repeatable effects.
-        rand = new Random(12345);
-        missedPickups = 0;
-        totalPassengersCreated = 0;
+        this.rand = new Random(12345); // Fixed seed for repeatable tests
+        this.missedPickups = 0;
+        this.totalPassengersCreated = 0;
     }
 
     /**
-     * Randomly generate a new passenger.
-     * Keep a count of missed pickups.
+     * Attempt to create a new passenger. If a taxi is available, assign it to
+     * the passenger and add the passenger to the city. Otherwise, increment
+     * the missed pickup counter.
      */
     public void act() {
         if (rand.nextDouble() <= CREATION_PROBABILITY) {
@@ -55,38 +49,37 @@ public class PassengerSource implements Actor {
     }
 
     /**
-     * @return The number of passengers for whom a pickup
-     * could not be found.
+     * @return The number of passengers who could not be picked up
+     * due to lack of available taxis.
      */
     public int getMissedPickups() {
         return missedPickups;
     }
 
     /**
-     * @return The total number of passengers created.
+     * @return The total number of passengers created since the start.
      */
     public int getTotalPassengersCreated() {
         return totalPassengersCreated;
     }
+
     /**
-     * Create a new passenger with distinct pickup and
-     * destination locations.
+     * Create a new passenger with random pickup and destination
+     * locations (ensuring they are different).
      *
-     * @return The created passenger.
+     * @return The newly created Passenger object.
      */
     private Passenger createPassenger() {
         int cityWidth = city.getWidth();
         int cityHeight = city.getHeight();
 
-        Location pickupLocation =
-                new Location(rand.nextInt(cityWidth),
-                        rand.nextInt(cityHeight));
+        Location pickupLocation = new Location(rand.nextInt(cityWidth), rand.nextInt(cityHeight));
         Location destination;
+
         do {
-            destination =
-                    new Location(rand.nextInt(cityWidth),
-                            rand.nextInt(cityHeight));
+            destination = new Location(rand.nextInt(cityWidth), rand.nextInt(cityHeight));
         } while (pickupLocation.equals(destination));
+
         return new Passenger(pickupLocation, destination);
     }
 }

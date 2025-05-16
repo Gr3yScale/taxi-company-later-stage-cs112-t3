@@ -1,26 +1,24 @@
 import java.util.*;
 
-/**
- * Model the operation of a taxi company, operating different
- * types of vehicle. This version operates a only taxis.
- *
- * @author David J. Barnes and Michael Kölling
- * @version 2016.02.29
- */
 public class TaxiCompany {
-    // The vehicles operated by the company.
+    // List of vehicles operated by the company.
     private final List<Vehicle> vehicles;
     private final City city;
-    // Track pickups and dropoffs.
+
+    // Statistics for pickups and dropoffs.
     private int totalPickups;
     private int totalDropoffs;
-    // Associations between vehicles and the passengers they are to pick up.
+
+    // Maps vehicles to their assigned passengers.
     private final Map<Vehicle, Passenger> assignments;
 
     private static final int NUMBER_OF_TAXIS = 3;
 
     /**
-     * @param city The city.
+     * Create a TaxiCompany operating in the given city.
+     *
+     * @param city The city where the company operates.
+     * @throws IllegalArgumentException if city is null.
      */
     public TaxiCompany(City city) {
         if (city == null) {
@@ -49,7 +47,7 @@ public class TaxiCompany {
     }
 
     /**
-     * Return the number of taxis that currently have passengers.
+     * @return The number of taxis currently carrying passengers.
      */
     public int getActiveTaxiCount() {
         int count = 0;
@@ -64,8 +62,9 @@ public class TaxiCompany {
     /**
      * Request a pickup for the given passenger.
      *
-     * @param passenger The passenger requesting a pickup.
-     * @return Whether a free vehicle is available.
+     * @param passenger The passenger requesting pickup.
+     * @return true if a free vehicle was assigned, false otherwise.
+     * @throws IllegalArgumentException if passenger is null.
      */
     public boolean requestPickup(Passenger passenger) {
         if (passenger == null) {
@@ -76,11 +75,13 @@ public class TaxiCompany {
             assignments.put(vehicle, passenger);
             vehicle.setPickupLocation(passenger.getPickupLocation());
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
+    /**
+     * @return The total number of idle steps for all taxis.
+     */
     public int getTotalIdleSteps() {
         int total = 0;
         for (Vehicle v : vehicles) {
@@ -90,11 +91,13 @@ public class TaxiCompany {
         }
         return total;
     }
+
     /**
-     * A vehicle has arrived at a pickup point.
+     * Called when a vehicle arrives at a pickup location.
      *
-     * @param vehicle The vehicle at the pickup point.
-     * @throws MissingPassengerException If there is no passenger waiting.
+     * @param vehicle The vehicle that has arrived.
+     * @throws IllegalArgumentException if vehicle is null.
+     * @throws MissingPassengerException if there is no passenger to pick up.
      */
     public void arrivedAtPickup(Vehicle vehicle) {
         if (vehicle == null) {
@@ -106,14 +109,15 @@ public class TaxiCompany {
         }
         city.removeItem(passenger);
         vehicle.pickup(passenger);
-        incrementPickups(); // Count pickup
+        incrementPickups();
     }
 
     /**
-     * A vehicle has arrived at a passenger's destination.
+     * Called when a vehicle arrives at a passenger's destination.
      *
-     * @param vehicle   The vehicle at the destination.
+     * @param vehicle   The vehicle that has arrived.
      * @param passenger The passenger being dropped off.
+     * @throws IllegalArgumentException if either parameter is null.
      */
     public void arrivedAtDestination(Vehicle vehicle, Passenger passenger) {
         if (vehicle == null) {
@@ -122,20 +126,20 @@ public class TaxiCompany {
         if (passenger == null) {
             throw new IllegalArgumentException("Passenger cannot be null");
         }
-        incrementDropoffs(); // Count dropoff
+        incrementDropoffs();
     }
 
     /**
-     * @return The list of vehicles.
+     * @return The list of vehicles operated by the company.
      */
     public List<Vehicle> getVehicles() {
         return vehicles;
     }
 
     /**
-     * Find a free vehicle, if any.
+     * Find and return a free vehicle.
      *
-     * @return A free vehicle, or null if there is none.
+     * @return A free vehicle, or null if none are available.
      */
     private Vehicle scheduleVehicle() {
         for (Vehicle vehicle : vehicles) {
@@ -147,8 +151,7 @@ public class TaxiCompany {
     }
 
     /**
-     * Set up this company's vehicles.
-     * Vehicles start at random locations.
+     * Set up the company's vehicles at random locations within the city.
      */
     private void setupVehicles() {
         int cityWidth = city.getWidth();

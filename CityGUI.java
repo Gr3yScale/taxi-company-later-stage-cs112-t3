@@ -2,60 +2,54 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Iterator;
 
-/**
- * Provide a view of the vehicles and passengers in the city.
- *
- * @author David J. Barnes and Michael Kölling
- * @version 2016.02.29
- */
 public class CityGUI extends JFrame implements Actor {
-    // The dimensions of the GUI.
+    // GUI dimensions
     public static final int CITY_VIEW_WIDTH = 600;
     public static final int CITY_VIEW_HEIGHT = 600;
+
     private final City city;
     private final TaxiCompany company;
+    private final PassengerSource passengerSource;
     private final CityView cityView;
 
-    // Task 16.27
+    // Label for displaying simulation statistics
     private final JLabel statsLabel;
-    private final PassengerSource passengerSource;
-
 
     /**
-     * Constructor for objects of class CityGUI
+     * Create the CityGUI window and display the city state.
      *
-     * @param city    The city whose state is to be displayed.
-     * @param company The taxi company that manages taxis and passengers.
+     * @param city             The city being simulated.
+     * @param company          The taxi company operating in the city.
+     * @param passengerSource  The source of passenger creation and stats.
      */
     public CityGUI(City city, TaxiCompany company, PassengerSource passengerSource) {
-        if (city == null)
-            throw new NullPointerException("City cannot be null");
-        if (company == null)
-            throw new NullPointerException("Company cannot be null");
-        if (passengerSource == null)
-            throw new NullPointerException("PassengerSource cannot be null");
+        if (city == null) throw new NullPointerException("City cannot be null");
+        if (company == null) throw new NullPointerException("Company cannot be null");
+        if (passengerSource == null) throw new NullPointerException("PassengerSource cannot be null");
 
         this.city = city;
         this.company = company;
         this.passengerSource = passengerSource;
 
         cityView = new CityView(city.getWidth(), city.getHeight());
-        getContentPane().add(cityView);
+        statsLabel = new JLabel("Pickups: 0  |  Dropoffs: 0");
+        statsLabel.setFont(new Font("Monospaced", Font.BOLD, 7));
+
         setTitle("Taxiville");
         setResizable(false);
         setSize(CITY_VIEW_WIDTH, CITY_VIEW_HEIGHT);
-        setVisible(true);
-        statsLabel = new JLabel("Pickups: 0  |  Dropoffs: 0");
-        statsLabel.setFont(new Font("Monospaced", Font.BOLD, 7));
+        getContentPane().add(cityView);
         getContentPane().add(statsLabel, BorderLayout.SOUTH);
+        setVisible(true);
     }
 
     /**
-     * Display the current state of the city.
+     * Update the GUI with the current city state and statistics.
      */
     public void act() {
         cityView.preparePaint();
         Iterator<Item> items = city.getItems();
+
         while (items.hasNext()) {
             Item item = items.next();
             if (item instanceof DrawableItem drawable) {
@@ -63,22 +57,23 @@ public class CityGUI extends JFrame implements Actor {
                 cityView.drawImage(location.getX(), location.getY(), drawable.getImage());
             }
         }
-        // Update stats label
+
+        // Update statistics
         int pickups = company.getTotalPickups();
         int dropoffs = company.getTotalDropoffs();
         int missed = passengerSource.getMissedPickups();
         int created = passengerSource.getTotalPassengersCreated();
         long activeTaxis = company.getVehicles().stream().filter(v -> !v.isFree()).count();
 
-        statsLabel.setText(String.format("Passengers Collected: %d  |  Passengers Dropped Off: %d  |  Passengers Missed: %d  |  Jobs Created: %d  |  Active Taxis: %d",
+        statsLabel.setText(String.format(
+                "Passengers Collected: %d  |  Passengers Dropped Off: %d  |  Passengers Missed: %d  |  Jobs Created: %d  |  Active Taxis: %d",
                 pickups, dropoffs, missed, created, activeTaxis));
+
         cityView.repaint();
     }
+
     /**
-     * Provide a graphical view of a rectangular city. This is
-     * a nested class (a class defined inside a class) which
-     * defines a custom component for the user interface. This
-     * component displays the city.
+     * Component for graphically displaying the city grid.
      */
     private class CityView extends JPanel {
         private final int VIEW_SCALING_FACTOR = 6;
@@ -90,7 +85,10 @@ public class CityGUI extends JFrame implements Actor {
         private Image cityImage;
 
         /**
-         * Create a new CityView component.
+         * Create a new CityView panel.
+         *
+         * @param width  Width of the city grid.
+         * @param height Height of the city grid.
          */
         public CityView(int width, int height) {
             cityWidth = width;
@@ -100,7 +98,7 @@ public class CityGUI extends JFrame implements Actor {
         }
 
         /**
-         * Tell the GUI manager how big we would like to be.
+         * Return the preferred size of this component.
          */
         public Dimension getPreferredSize() {
             return new Dimension(cityWidth * VIEW_SCALING_FACTOR,
@@ -108,24 +106,22 @@ public class CityGUI extends JFrame implements Actor {
         }
 
         /**
-         * Prepare for a new round of painting. Since the component
-         * may be resized, compute the scaling factor again.
+         * Prepare for painting the city grid. Recompute scale if resized.
          */
         public void preparePaint() {
-            if (!size.equals(getSize())) {  // if the size has changed...
+            if (!size.equals(getSize())) {
                 size = getSize();
-                cityImage = cityView.createImage(size.width, size.height);
+                cityImage = createImage(size.width, size.height);
                 g = cityImage.getGraphics();
 
                 xScale = size.width / cityWidth;
-                if (xScale < 1) {
-                    xScale = VIEW_SCALING_FACTOR;
-                }
+                if (xScale < 1) xScale = VIEW_SCALING_FACTOR;
+
                 yScale = size.height / cityHeight;
-                if (yScale < 1) {
-                    yScale = VIEW_SCALING_FACTOR;
-                }
+                if (yScale < 1) yScale = VIEW_SCALING_FACTOR;
             }
+
+            // Clear background and draw grid
             g.setColor(Color.white);
             g.fillRect(0, 0, size.width, size.height);
             g.setColor(Color.gray);
@@ -138,7 +134,11 @@ public class CityGUI extends JFrame implements Actor {
         }
 
         /**
-         * Draw the image for a particular item.
+         * Draw an image at the specified grid location.
+         *
+         * @param x     X position in the city grid.
+         * @param y     Y position in the city grid.
+         * @param image The image to draw.
          */
         public void drawImage(int x, int y, Image image) {
             g.drawImage(image, x * xScale + 1, y * yScale + 1,
@@ -146,8 +146,9 @@ public class CityGUI extends JFrame implements Actor {
         }
 
         /**
-         * The city view component needs to be redisplayed. Copy the
-         * internal image to screen.
+         * Paint the city view on the screen.
+         *
+         * @param g The graphics context.
          */
         public void paintComponent(Graphics g) {
             if (cityImage != null) {
@@ -155,7 +156,7 @@ public class CityGUI extends JFrame implements Actor {
                 if (size.equals(currentSize)) {
                     g.drawImage(cityImage, 0, 0, null);
                 } else {
-                    // Rescale the previous image.
+                    // Rescale image to fit new component size
                     g.drawImage(cityImage, 0, 0, currentSize.width, currentSize.height, null);
                 }
             }

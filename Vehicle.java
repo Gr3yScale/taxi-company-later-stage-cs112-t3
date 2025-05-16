@@ -1,27 +1,18 @@
-/**
- * Model the common elements of taxis and shuttles.
- *
- * @author David J. Barnes and Michael Kölling
- * @version 2016.02.29
- */
 public abstract class Vehicle implements Actor {
     private TaxiCompany company;
-    // Where the vehicle is.
     private Location location;
-    // Where the vehicle is headed.
     private Location targetLocation;
-    // Record how often the vehicle has nothing to do.
     private int idleCount;
     private int pickupTravelTime;
     private int destinationTravelTime;
     private boolean headingForPickup;
 
     /**
-     * Constructor of class Vehicle
+     * Create a new vehicle for the given company at the specified location.
      *
-     * @param company  The taxi company. Must not be null.
-     * @param location The vehicle's starting point. Must not be null.
-     * @throws NullPointerException If company or location is null.
+     * @param company  The company operating this vehicle. Must not be null.
+     * @param location The starting location of this vehicle. Must not be null.
+     * @throws NullPointerException if company or location is null.
      */
     public Vehicle(TaxiCompany company, Location location) {
         if (company == null) {
@@ -37,26 +28,28 @@ public abstract class Vehicle implements Actor {
     }
 
     /**
-     * Notify the company of our arrival at a pickup location.
+     * Notify the company that this vehicle has arrived at a pickup location.
      */
     public void notifyPickupArrival() {
         company.arrivedAtPickup(this);
     }
 
     /**
-     * Notify the company of our arrival at a
-     * passenger's destination.
+     * Notify the company that this vehicle has arrived at a passenger's destination.
+     *
+     * @param passenger The passenger being dropped off. Must not be null.
+     * @throws NullPointerException if passenger is null.
      */
     public void notifyPassengerArrival(Passenger passenger) {
         if (passenger == null) {
             throw new NullPointerException("passenger");
-        } else
-            company.arrivedAtDestination(this, passenger);
+        }
+        company.arrivedAtDestination(this, passenger);
     }
 
     /**
-     * Receive a pickup location.
-     * How this is handled depends on the type of vehicle.
+     * Assign a pickup location to this vehicle.
+     * How the vehicle handles this is defined by the subclass.
      *
      * @param location The pickup location.
      */
@@ -64,37 +57,38 @@ public abstract class Vehicle implements Actor {
 
     /**
      * Receive a passenger.
-     * How this is handled depends on the type of vehicle.
+     * How the vehicle handles this is defined by the subclass.
      *
-     * @param passenger The passenger.
+     * @param passenger The passenger to pick up.
      */
     public abstract void pickup(Passenger passenger);
 
     /**
-     * Is the vehicle free?
+     * Check whether the vehicle is free.
      *
-     * @return Whether or not this vehicle is free.
+     * @return true if the vehicle is available, false otherwise.
      */
     public abstract boolean isFree();
 
     /**
-     * Offload any passengers whose destination is the
-     * current location.
+     * Attempt to offload any passenger(s) whose destination matches the current location.
      */
     public abstract void offloadPassenger();
 
     /**
-     * @return Where this vehicle is currently located.
+     * Get the current location of this vehicle.
+     *
+     * @return The current location.
      */
     public Location getLocation() {
         return location;
     }
 
     /**
-     * Set the current location.
+     * Set the current location of this vehicle.
      *
-     * @param location Where it is. Must not be null.
-     * @throws NullPointerException If location is null.
+     * @param location The new location. Must not be null.
+     * @throws NullPointerException if location is null.
      */
     public void setLocation(Location location) {
         if (location != null) {
@@ -105,20 +99,19 @@ public abstract class Vehicle implements Actor {
     }
 
     /**
-     * Get the target location.
+     * Get the target location this vehicle is heading toward.
      *
-     * @return Where this vehicle is currently headed, or null
-     * if it is idle.
+     * @return The target location, or null if the vehicle is idle.
      */
     public Location getTargetLocation() {
         return targetLocation;
     }
 
     /**
-     * Set the required target location.
+     * Set a new target location for the vehicle.
      *
-     * @param location Where to go. Must not be null.
-     * @throws NullPointerException If location is null.
+     * @param location The destination. Must not be null.
+     * @throws NullPointerException if location is null.
      */
     public void setTargetLocation(Location location) {
         if (location != null) {
@@ -129,22 +122,23 @@ public abstract class Vehicle implements Actor {
     }
 
     /**
-     * Clear the target location.
+     * Clear the target location (vehicle becomes idle).
      */
     public void clearTargetLocation() {
         targetLocation = null;
     }
 
     /**
-     * @return On how many steps this vehicle has been idle.
+     * Get the number of steps this vehicle has been idle.
+     *
+     * @return The idle step count.
      */
     public int getIdleCount() {
         return idleCount;
     }
 
     /**
-     * Increment the number of steps on which this vehicle
-     * has been idle.
+     * Increment the count of idle steps for this vehicle.
      */
     public void incrementIdleCount() {
         idleCount++;

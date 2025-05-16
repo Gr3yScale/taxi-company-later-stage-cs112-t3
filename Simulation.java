@@ -1,18 +1,13 @@
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Run the simulation by asking a collection of actors to act.
- *
- * @author David J. Barnes and Michael Kölling
- * @version 2016.02.29
- */
 public class Simulation {
     private final List<Actor> actors;
     private int step;
 
     /**
-     * Create the initial set of actors for the simulation.
+     * Construct the simulation and initialize its components.
+     * Sets up the city, taxi company, passenger source, and GUI.
      */
     public Simulation() {
         actors = new LinkedList<>();
@@ -21,15 +16,15 @@ public class Simulation {
         TaxiCompany company = new TaxiCompany(city);
         PassengerSource source = new PassengerSource(city, company);
 
-        // Adding all vehicles, source, and GUI to the actors list
+        // Register vehicles, passenger source, and GUI as actors
         actors.addAll(company.getVehicles());
         actors.add(source);
-        actors.add(new CityGUI(city, company, source)); // Pass PassengerSource here
+        actors.add(new CityGUI(city, company, source));
     }
 
     /**
      * Run the simulation for a fixed number of steps.
-     * Pause after each step to allow the GUI to keep up.
+     * Delays between steps to allow the GUI to update.
      */
     public void run() {
         for (int i = 0; i < 5000; i++) {
@@ -40,7 +35,7 @@ public class Simulation {
     }
 
     /**
-     * Take a single step of the simulation.
+     * Take a single step in the simulation by allowing each actor to act.
      */
     public void step() {
         for (Actor actor : actors) {
@@ -49,16 +44,15 @@ public class Simulation {
     }
 
     /**
-     * Wait for a specified number of milliseconds before finishing.
-     * This provides an easy way to cause a small delay.
+     * Pause execution for a short time to simulate delay and allow GUI updates.
      *
-     * @param milliseconds The number of milliseconds to wait.
+     * @param milliseconds The duration to wait in milliseconds.
      */
     private void wait(int milliseconds) {
         try {
             Thread.sleep(milliseconds);
         } catch (InterruptedException e) {
-            // ignore the exception
+            // Interrupted while sleeping — ignore.
         }
     }
 }
