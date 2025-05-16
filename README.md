@@ -7,8 +7,8 @@
 | **Name**       | **Work Contribution** |
 |----------------|-----------------------|
 | Isaac Oxenham  | 16.26                 |
-| Cameron Clancy |                       |
-| Stuart Barr    |                       |
+| Cameron Clancy | 16.27 & 26.28         |
+| Stuart Barr    | 16.27 & 26.28         |
 | Russel Wright  |                       |
 
 ![img.png](tasks.png)
